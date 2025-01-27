@@ -29,11 +29,15 @@ export class AnimationController {
 
     addNextShapeToTimeline() {
         const currentShape = this.shapeSequence[this.currentShapeIndex];
-        const shapeGenerator = this.shapeManager.getShape(currentShape);
+        const nextShapeIndex = (this.currentShapeIndex + 1) % this.shapeSequence.length;
+        const nextShape = this.shapeSequence[nextShapeIndex];
         
-        if (shapeGenerator) {
-            // Add the shape animation to the timeline
-            const shapeTimeline = this.gridSystem.activateDots(shapeGenerator);
+        const currentGenerator = this.shapeManager.getShape(currentShape);
+        const nextGenerator = this.shapeManager.getShape(nextShape);
+        
+        if (currentGenerator && nextGenerator) {
+            // Add the shape transition animation to the timeline
+            const shapeTimeline = this.gridSystem.transitionShapes(currentGenerator, nextGenerator);
             this.mainTimeline.add(shapeTimeline);
         }
     }
@@ -45,6 +49,5 @@ export class AnimationController {
 
     update() {
         // GSAP handles the animation updates automatically
-        // This method is kept for compatibility with the existing code
     }
 }
