@@ -7,18 +7,30 @@ export class ShapeManager {
     initializeShapes() {
         // Line Chart
         this.addShape('lineChart', (t, x, y) => {
-            // Create a smooth line that varies in height
-            const lineHeight = 0.7 - 0.4 * Math.sin(x * Math.PI * 2);
+            // Define key points for the line (x, y coordinates)
+            const points = [
+                { x: 0.0, y: 0.8 },    // Start at left edge
+                { x: 0.25, y: 0.6 },   // Point 1
+                { x: 0.5, y: 0.7 },    // Point 2
+                { x: 1.0, y: 0.3 }     // End at right edge
+            ];
             
-            // Return 1 if above the line, 0 if below
-            const transitionWidth = 0.01;
-            const distance = y - lineHeight;
-            
-            if (distance > transitionWidth) {
-                return 1; // Active above the line
-            } else if (distance > 0) {
-                return distance / transitionWidth;
+            // Find the line segment we're in
+            for (let i = 0; i < points.length - 1; i++) {
+                const p1 = points[i];
+                const p2 = points[i + 1];
+                
+                if (x >= p1.x && x <= p2.x) {
+                    // Linear interpolation between points
+                    const progress = (x - p1.x) / (p2.x - p1.x);
+                    const lineHeight = p1.y + (p2.y - p1.y) * progress;
+                    
+                    // Keep same thickness
+                    const thickness = 0.15;
+                    return Math.abs(y - lineHeight) < thickness ? 1 : 0;
+                }
             }
+            
             return 0;
         });
 
@@ -38,7 +50,8 @@ export class ShapeManager {
             // Find if we're in any bar
             for (const bar of bars) {
                 if (Math.abs(x - bar.pos) < barWidth / 2) {
-                    return y > (1 - bar.height) ? 0 : 1;
+                    // Changed to measure from bottom (y=1) upward
+                    return y > (1 - bar.height) ? 1 : 0;
                 }
             }
             
@@ -50,14 +63,15 @@ export class ShapeManager {
             // Center of the pie
             const centerX = 0.5;
             const centerY = 0.5;
+            const radius = 0.45;  // Larger radius to match other shapes
             
-            // Calculate distance from center and angle
-            const dx = x - centerX;
+            // Normalize coordinates to make circle perfect (fix horizontal stretch)
+            const dx = (x - centerX) * 1.5; // Compress x-axis to counter stretch
             const dy = y - centerY;
             const distance = Math.sqrt(dx * dx + dy * dy);
             const angle = Math.atan2(dy, dx);
             
-            // Define pie segments (start angle, end angle)
+            // Define pie segments
             const segments = [
                 { start: 0, end: Math.PI * 0.5 },
                 { start: Math.PI * 0.5, end: Math.PI },
@@ -65,17 +79,12 @@ export class ShapeManager {
                 { start: Math.PI * 1.5, end: Math.PI * 2 }
             ];
             
-            // Check if point is within pie radius
-            const maxRadius = 0.4;
-            if (distance <= maxRadius) {
-                // Normalize angle to 0-2π range
+            if (distance <= radius) {
                 const normalizedAngle = angle < 0 ? angle + Math.PI * 2 : angle;
                 
-                // Check which segment we're in
                 for (let i = 0; i < segments.length; i++) {
                     const segment = segments[i];
                     if (normalizedAngle >= segment.start && normalizedAngle < segment.end) {
-                        // Alternate segments are active
                         return i % 2 === 0 ? 1 : 0;
                     }
                 }
