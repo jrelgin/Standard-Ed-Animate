@@ -1,47 +1,58 @@
-# Grid Animation System
+# Standard Ed Animated
 
-An interactive grid-based animation system that creates flowing dot animations to visualize data in various chart forms.
+An elegant collection of interactive SVG animations using physics-based particle systems. Each animation creates a unique, engaging user experience with smooth, responsive interactions.
 
 ## Features
 
-- Smooth flowing dot animations from left to right
-- Three distinct data visualization shapes:
-  - Line Chart
-  - Bar Chart
-  - Pie Chart
-- Automatic transitions between shapes
-- Debug mode for grid visualization
+- Three distinct interactive animations:
+  - Grid Animation: Flowing dots with shape transitions
+  - Pie Chart Animation: Interactive particle system in a pie shape
+  - Delta Animation: Interactive particle system in a delta shape
+- Physics-based interactions with mouse movement
+- Smooth scaling and movement transitions
 - Responsive design that adapts to window size
+- Beautiful color schemes:
+  - Grid: Black background with flowing animations
+  - Pie: White background with teal dots
+  - Delta: Deep blue background with white dots
 
 ## Project Structure
 
 ```
-grid-animation-system/
-├── index.html              # Main HTML file
+standard-ed-animated/
 ├── src/
-│   ├── styles/
-│   │   └── main.css       # Styling
+│   ├── index.html           # Grid animation
+│   ├── physics.html         # Pie chart animation
+│   ├── delta.html          # Delta animation
+│   ├── assets/
+│   │   └── svg/            # SVG shapes for animations
 │   └── js/
-│       ├── main.js        # Application entry point
-│       ├── grid.js        # Grid system and dot management
-│       ├── shapes.js      # Shape definitions
-│       ├── animations.js  # Animation controller
-│       └── interactions.js # User interaction handling
+│       ├── grid-animation/  # Grid animation system
+│       ├── physics-animation/ # Pie chart physics
+│       └── delta-animation/  # Delta physics
 ```
 
 ## Running the Project
 
 1. Clone the repository
-2. Open index.html in a modern web browser
-3. The animation will start automatically
-
-## Controls
-
-- Toggle Debug Mode: Shows the grid structure and dot boundaries
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open http://localhost:5173 in your browser
 
 ## Implementation Details
 
-- Uses HTML5 Canvas for rendering
-- Implements smooth easing functions for natural motion
-- Supports high DPI displays
+- Built with Vite for modern development
+- Uses GSAP for smooth animations
+- SVG-based particle systems
+- Physics-based interactions
 - Modular architecture for easy extension
+
+## License
+
+MIT License
