@@ -8,10 +8,10 @@ export class PhysicsAnimation {
         this.mouseX = 0;
         this.mouseY = 0;
         this.gravity = 0.1;          // Same as pie
-        this.influenceRadius = 150;  // EXACTLY same as pie, no scaling needed!
+        this.influenceRadius = 150;  // Same as pie
         this.maxScale = 2.5;         // Same as pie
-        this.particleSize = 0.5;     // Keep small for detail
-        this.spacing = 1;            // Keep tight for detail
+        this.particleSize = 4;       // Same as pie
+        this.spacing = 15;           // Same as pie
         this.svgColor = '#247B7B';   // Delta's teal color
         
         // Initialize
@@ -36,14 +36,19 @@ export class PhysicsAnimation {
             const originalSvg = svgDoc.querySelector('svg');
             const path = svgDoc.querySelector('path');
             
-            // Set the viewBox to match the original SVG but with extra space at bottom
-            this.svg.setAttribute('viewBox', '0 0 81 72'); // Added 2 units for bottom dots
+            // Scale up the viewBox to match the pie chart scale
+            const scaleUp = 1200 / 81; // Scale factor to match pie's 1200px width
+            const originalPath = path.getAttribute('d');
+            const scaledPath = this.scalePath(originalPath, scaleUp);
+            
+            // Set the viewBox to match the pie chart
+            this.svg.setAttribute('viewBox', '0 0 1200 1035'); // Scale height proportionally
             this.svg.style.width = '80vmin';
-            this.svg.style.height = '71vmin';  // Maintain aspect ratio
+            this.svg.style.height = '69vmin';  // Maintain aspect ratio
             
             // Create and append the path (invisible, just for hit testing)
             const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            newPath.setAttribute('d', path.getAttribute('d'));
+            newPath.setAttribute('d', scaledPath);
             newPath.setAttribute('fill', '#000000');
             newPath.style.fillOpacity = '0';
             this.svg.appendChild(newPath);
@@ -55,6 +60,13 @@ export class PhysicsAnimation {
         }
     }
 
+    // Helper function to scale SVG path
+    scalePath(pathData, scale) {
+        return pathData.replace(/[\d.-]+/g, (number) => {
+            return (parseFloat(number) * scale).toFixed(2);
+        });
+    }
+
     isPointInSVG(x, y) {
         const point = this.svg.createSVGPoint();
         point.x = x;
@@ -63,9 +75,9 @@ export class PhysicsAnimation {
     }
 
     createParticles() {
-        // Calculate grid dimensions based on SVG size plus extra row
-        const cols = Math.floor(81 / this.spacing);
-        const rows = Math.floor(72 / this.spacing); // Extended for bottom dots
+        // Calculate grid dimensions based on scaled SVG size
+        const cols = Math.floor(1200 / this.spacing);
+        const rows = Math.floor(1035 / this.spacing);
         
         // Create grid of particles
         for (let row = 0; row < rows; row++) {
@@ -100,8 +112,8 @@ export class PhysicsAnimation {
     setupEventListeners() {
         this.svg.addEventListener('mousemove', (e) => {
             const rect = this.svg.getBoundingClientRect();
-            const scaleX = 81 / rect.width;
-            const scaleY = 72 / rect.height; // Update scaleY
+            const scaleX = 1200 / rect.width;
+            const scaleY = 1035 / rect.height;
             
             // Convert mouse position to SVG coordinates
             this.mouseX = (e.clientX - rect.left) * scaleX;
@@ -120,17 +132,17 @@ export class PhysicsAnimation {
                 // Calculate influence based on distance
                 const influence = 1 - (distance / this.influenceRadius);
                 
-                // Even gentler push force - EXACTLY same as pie
+                // Even gentler push force
                 const pushForce = 0.5;
                 particle.velocityX -= (dx / distance) * pushForce * influence;
                 particle.velocityY -= (dy / distance) * pushForce * influence;
                 
                 // Scale up based on proximity with smoother transition
                 const targetScale = 1 + (this.maxScale - 1) * influence;
-                particle.scale += (targetScale - particle.scale) * 0.15;  // Same as pie
+                particle.scale += (targetScale - particle.scale) * 0.15;
             } else {
                 // Return to original size more smoothly
-                particle.scale += (1 - particle.scale) * 0.15;  // Same as pie
+                particle.scale += (1 - particle.scale) * 0.15;
             }
             
             // Apply gravity towards original position
@@ -140,8 +152,8 @@ export class PhysicsAnimation {
             particle.velocityY += homeY * this.gravity;
             
             // Even stronger damping for smoother movement
-            particle.velocityX *= 0.9;  // Same as pie
-            particle.velocityY *= 0.9;  // Same as pie
+            particle.velocityX *= 0.9;
+            particle.velocityY *= 0.9;
             particle.x += particle.velocityX;
             particle.y += particle.velocityY;
             
