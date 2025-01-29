@@ -1,17 +1,23 @@
 {
-  "name": "grid-animation-system",
+  "name": "standard-ed-animate",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "animation",
+    "svg",
+    "physics",
+    "interactive",
+    "particles"
+  ],
+  "author": "Jason Elgin",
+  "license": "MIT",
+  "description": "An elegant collection of interactive SVG animations using physics-based particle systems",
   "devDependencies": {
     "vite": "^6.0.11"
   },
