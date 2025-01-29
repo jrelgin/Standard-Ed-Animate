@@ -7,9 +7,9 @@ export class PhysicsAnimation {
         this.particles = [];
         this.mouseX = 0;
         this.mouseY = 0;
-        this.gravity = 0.5;
-        this.influenceRadius = 100;
-        this.maxScale = 3;
+        this.gravity = 0.2;
+        this.influenceRadius = 150;
+        this.maxScale = 2;
         this.particleSize = 4;
         this.spacing = 15; // Space between dots
         
@@ -119,8 +119,8 @@ export class PhysicsAnimation {
                 // Calculate influence based on distance
                 const influence = 1 - (distance / this.influenceRadius);
                 
-                // Push particle away from mouse
-                const pushForce = 2;
+                // Push particle away from mouse with gentler force
+                const pushForce = 0.8;
                 particle.velocityX -= (dx / distance) * pushForce * influence;
                 particle.velocityY -= (dy / distance) * pushForce * influence;
                 
@@ -138,9 +138,9 @@ export class PhysicsAnimation {
             particle.velocityX += homeX * this.gravity;
             particle.velocityY += homeY * this.gravity;
             
-            // Apply velocity with damping
-            particle.velocityX *= 0.95;
-            particle.velocityY *= 0.95;
+            // Apply stronger damping for smoother movement
+            particle.velocityX *= 0.85;
+            particle.velocityY *= 0.85;
             particle.x += particle.velocityX;
             particle.y += particle.velocityY;
             
