@@ -2,9 +2,7 @@ import { gsap } from 'gsap';
 
 export class PhysicsAnimation {
     constructor() {
-        console.log('PhysicsAnimation initialized');
         this.svg = document.getElementById('animation');
-        console.log('SVG element:', this.svg);
         this.svgPath = null;
         this.particles = [];
         this.mouseX = 0;
@@ -17,9 +15,7 @@ export class PhysicsAnimation {
         
         // Initialize
         this.loadSVG().then(() => {
-            console.log('SVG loaded, creating particles');
             this.createParticles();
-            console.log('Particles created:', this.particles.length);
             this.setupEventListeners();
             this.animate();
         });
@@ -32,14 +28,12 @@ export class PhysicsAnimation {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const svgText = await response.text();
-            console.log('SVG text loaded:', svgText.substring(0, 100) + '...');
             
             // Extract the path data and viewBox from the original SVG
             const parser = new DOMParser();
             const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
             const originalSvg = svgDoc.querySelector('svg');
             const path = svgDoc.querySelector('path');
-            console.log('Path data:', path.getAttribute('d').substring(0, 100) + '...');
             
             // Set the viewBox and size
             this.svg.setAttribute('viewBox', '0 0 1200 1200');
@@ -49,13 +43,12 @@ export class PhysicsAnimation {
             // Create and append the path (invisible, just for hit testing)
             const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
             newPath.setAttribute('d', path.getAttribute('d'));
-            newPath.setAttribute('fill', '#ff69b4');
-            newPath.style.opacity = '0.3'; // Make it semi-transparent for debugging
+            newPath.setAttribute('fill', 'none');
+            newPath.style.display = 'none';
             this.svg.appendChild(newPath);
             
             // Store reference to the path
             this.svgPath = newPath;
-            console.log('SVG path created and stored');
         } catch (error) {
             console.error('Error loading SVG:', error);
         }
@@ -65,20 +58,14 @@ export class PhysicsAnimation {
         const point = this.svg.createSVGPoint();
         point.x = x;
         point.y = y;
-        const result = this.svgPath.isPointInFill(point);
-        if (x % 100 === 0 && y % 100 === 0) {
-            console.log(`Testing point (${x}, ${y}): ${result}`);
-        }
-        return result;
+        return this.svgPath.isPointInFill(point);
     }
 
     createParticles() {
         // Calculate grid dimensions
         const cols = Math.floor(1200 / this.spacing);
         const rows = Math.floor(1200 / this.spacing);
-        console.log(`Creating grid: ${cols}x${rows}`);
         
-        let particleCount = 0;
         // Create grid of particles
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
@@ -104,11 +91,9 @@ export class PhysicsAnimation {
                         velocityY: 0,
                         scale: 1
                     });
-                    particleCount++;
                 }
             }
         }
-        console.log(`Created ${particleCount} particles`);
     }
 
     setupEventListeners() {
@@ -121,7 +106,6 @@ export class PhysicsAnimation {
             this.mouseX = (e.clientX - rect.left) * scaleX;
             this.mouseY = (e.clientY - rect.top) * scaleY;
         });
-        console.log('Event listeners set up');
     }
 
     animate() {
