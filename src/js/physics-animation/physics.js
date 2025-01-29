@@ -7,9 +7,9 @@ export class PhysicsAnimation {
         this.particles = [];
         this.mouseX = 0;
         this.mouseY = 0;
-        this.gravity = 0.2;
+        this.gravity = 0.1;          // Reduced from 0.2 for smoother return
         this.influenceRadius = 150;
-        this.maxScale = 2;
+        this.maxScale = 2.5;         // Increased from 2
         this.particleSize = 4;
         this.spacing = 15; // Space between dots
         
@@ -119,17 +119,17 @@ export class PhysicsAnimation {
                 // Calculate influence based on distance
                 const influence = 1 - (distance / this.influenceRadius);
                 
-                // Push particle away from mouse with gentler force
-                const pushForce = 0.8;
+                // Even gentler push force
+                const pushForce = 0.5;  // Reduced from 0.8
                 particle.velocityX -= (dx / distance) * pushForce * influence;
                 particle.velocityY -= (dy / distance) * pushForce * influence;
                 
-                // Scale up based on proximity
+                // Scale up based on proximity with smoother transition
                 const targetScale = 1 + (this.maxScale - 1) * influence;
-                particle.scale += (targetScale - particle.scale) * 0.1;
+                particle.scale += (targetScale - particle.scale) * 0.15;  // Increased from 0.1
             } else {
-                // Return to original size
-                particle.scale += (1 - particle.scale) * 0.1;
+                // Return to original size more smoothly
+                particle.scale += (1 - particle.scale) * 0.15;  // Increased from 0.1
             }
             
             // Apply gravity towards original position
@@ -138,9 +138,9 @@ export class PhysicsAnimation {
             particle.velocityX += homeX * this.gravity;
             particle.velocityY += homeY * this.gravity;
             
-            // Apply stronger damping for smoother movement
-            particle.velocityX *= 0.85;
-            particle.velocityY *= 0.85;
+            // Even stronger damping for smoother movement
+            particle.velocityX *= 0.9;  // Increased from 0.85
+            particle.velocityY *= 0.9;
             particle.x += particle.velocityX;
             particle.y += particle.velocityY;
             
