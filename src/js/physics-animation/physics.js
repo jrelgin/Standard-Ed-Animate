@@ -78,7 +78,7 @@ export class PhysicsAnimation {
                     circle.setAttribute("cx", x);
                     circle.setAttribute("cy", y);
                     circle.setAttribute("r", this.particleSize);
-                    circle.setAttribute("fill", "#ff69b4");
+                    circle.setAttribute("fill", "#247B7B");
                     this.svg.appendChild(circle);
                     
                     this.particles.push({
