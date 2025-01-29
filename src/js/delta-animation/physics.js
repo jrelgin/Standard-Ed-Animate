@@ -12,7 +12,7 @@ export class PhysicsAnimation {
         this.maxScale = 2.5;         // Same as pie
         this.particleSize = 4;       // Same as pie
         this.spacing = 15;           // Same as pie
-        this.svgColor = '#247B7B';   // Delta's teal color
+        this.svgColor = '#ffffff';   // White dots on black background
         
         // Initialize
         this.loadSVG().then(() => {
