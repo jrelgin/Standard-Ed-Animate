@@ -1,5 +1,5 @@
 export default {
-  root: '.',
+  root: 'src',
   base: '/',
   server: {
     open: true
