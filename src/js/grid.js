@@ -15,7 +15,7 @@ export class GridSystem {
         this.timeline = gsap.timeline();
         this.flowDuration = 2; // in seconds for GSAP
         this.pauseDuration = 2; // in seconds for GSAP
-        this.activeColumnWidth = 50; // Number of columns that are "lit up" in the wave
+        this.activeColumnWidth = 20; // Number of columns that are "lit up" in the wave
         this.pulseFrequency = 3; // How many times the wave pulses per second
         
         // Handle high DPI displays
@@ -50,6 +50,9 @@ export class GridSystem {
         const offsetX = (width - (this.columns - 1) * this.spacing) / 2;
         const offsetY = (height - (this.rows - 1) * this.spacing) / 2;
 
+        // Generate random fade multipliers for each row (between 0.3 and 3.0 for high contrast)
+        const rowFadeMultipliers = Array(this.rows).fill(0).map(() => 0.3 + Math.random() * 2.7);
+
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.columns; col++) {
                 this.dots.push({
@@ -59,7 +62,8 @@ export class GridSystem {
                     row: row,
                     isPartOfShape: false,
                     opacity: 0.2,
-                    wavePosition: -1 // Position relative to the moving wave
+                    wavePosition: -1,
+                    fadeMultiplier: rowFadeMultipliers[row] // Store the row's fade multiplier
                 });
             }
         }
@@ -97,80 +101,52 @@ export class GridSystem {
         // Create a new timeline
         const tl = gsap.timeline();
         
-        // Animate the wave position from start to end
-        const waveProgress = { value: -this.activeColumnWidth };
+        // Animate the wave position from end to start (right to left)
+        const waveProgress = { value: this.columns + this.activeColumnWidth };
         
         tl.to(waveProgress, {
-            value: this.columns + this.activeColumnWidth,
+            value: -this.activeColumnWidth,
             duration: this.flowDuration,
             ease: "none",
             onUpdate: () => {
                 // Update each dot's opacity based on its position relative to the wave
                 this.dots.forEach(dot => {
-                    const distanceFromWave = Math.abs(dot.col - waveProgress.value);
+                    const distanceFromWave = dot.col - waveProgress.value;
                     
-                    if (waveProgress.value >= dot.col) {
+                    if (distanceFromWave >= 0) {
                         // Wave has passed this dot
                         if (dot.isPartOfShape) {
-                            // If it's part of the new shape, light it up
+                            // If it's part of the new shape, snap to full brightness
                             dot.opacity = 1;
                         } else {
-                            // If it's not part of the new shape, dim it
-                            dot.opacity = 0.2;
+                            // If it's not part of the shape, fade out behind the wave
+                            const fadeDistance = distanceFromWave;
+                            const fadeLength = this.activeColumnWidth * 0.5; // Length of fade trail
+                            if (fadeDistance <= fadeLength) {
+                                // Only the last few rows fade
+                                dot.opacity = 1 - (fadeDistance / fadeLength);
+                            } else {
+                                // Beyond fade distance, snap to dim
+                                dot.opacity = 0.2;
+                            }
                         }
+                    } else if (distanceFromWave >= -this.activeColumnWidth) {
+                        // Dot is in the active wave - full brightness
+                        dot.opacity = 1;
                     } else {
                         // Wave hasn't reached this dot yet
                         if (dot.wasPartOfPreviousShape) {
-                            // Keep previous shape dots lit until wave reaches them
                             dot.opacity = 1;
-                        }
-                        
-                        // Light up dots in the wave
-                        if (distanceFromWave <= this.activeColumnWidth / 2) {
-                            dot.opacity = 1;
+                        } else {
+                            dot.opacity = 0.2;
                         }
                     }
                 });
             }
         })
-        .to({}, { duration: this.pauseDuration }) // Pause to display shape
-        .to(waveProgress, {
-            value: this.columns + this.activeColumnWidth * 2,
-            duration: this.flowDuration,
-            ease: "none",
-            onUpdate: () => {
-                this.dots.forEach(dot => {
-                    const distanceFromWave = Math.abs(dot.col - waveProgress.value);
-                    
-                    if (distanceFromWave <= this.activeColumnWidth / 2) {
-                        // Dot is in the active wave
-                        dot.opacity = 1;
-                    } else if (waveProgress.value > dot.col) {
-                        // Wave has passed, all dots return to inactive state
-                        dot.opacity = 0.2;
-                    }
-                });
-            }
-        });
+        .to({}, { duration: this.pauseDuration }); // Pause to display shape
 
         return tl;
-    }
-
-    // Helper function to calculate wave effect
-    calculateWaveEffect(distanceFromWave, waveProgress, currentTime) {
-        // Base intensity drops off from center of wave
-        const normalizedDistance = Math.abs(distanceFromWave) / (this.activeColumnWidth / 2);
-        const baseIntensity = Math.max(0, 1 - normalizedDistance);
-        
-        // Add pulsing effect
-        const pulsePhase = (currentTime / 1000) * this.pulseFrequency * Math.PI;
-        const pulseEffect = 0.2 * Math.sin(pulsePhase); // 0.2 is pulse amplitude
-        
-        // Add subtle gradient based on position in wave
-        const gradientEffect = 0.15 * Math.sin((distanceFromWave / (this.activeColumnWidth / 2)) * Math.PI);
-        
-        // Combine effects
-        return Math.min(1, Math.max(0.2, baseIntensity + pulseEffect + gradientEffect));
     }
 
     transitionShapes(currentPattern, nextPattern) {
@@ -194,31 +170,38 @@ export class GridSystem {
         const tl = gsap.timeline();
         
         // Animate the wave position from start to end
-        const waveProgress = { 
-            value: -this.activeColumnWidth,
-            time: 0 // Track animation time for wave effects
-        };
+        const waveProgress = { value: -this.activeColumnWidth };
         
         tl.to(waveProgress, {
             value: this.columns + this.activeColumnWidth,
-            time: this.flowDuration,
             duration: this.flowDuration,
             ease: "none",
             onUpdate: () => {
-                const currentTime = performance.now();
                 this.dots.forEach(dot => {
                     const distanceFromWave = dot.col - waveProgress.value;
                     
-                    if (waveProgress.value >= dot.col) {
-                        // After wave passes, show next shape state
-                        dot.opacity = dot.isPartOfNextShape ? 1 : 0.2;
+                    if (distanceFromWave <= 0) {  // Wave has passed this dot
+                        if (dot.isPartOfNextShape) {
+                            dot.opacity = 1;  // Part of new shape, snap to full brightness
+                        } else {
+                            // Not part of shape, apply randomized fade effect
+                            const fadeDistance = Math.abs(distanceFromWave);
+                            const fadeLength = this.activeColumnWidth * 0.5;
+                            if (fadeDistance <= fadeLength) {
+                                // Apply the row's fade multiplier to create varying fade speeds
+                                const fadeProgress = (fadeDistance / fadeLength) * dot.fadeMultiplier;
+                                dot.opacity = Math.max(0.2, 1 - fadeProgress);
+                            } else {
+                                dot.opacity = 0.2;
+                            }
+                        }
+                    } else if (distanceFromWave <= this.activeColumnWidth) {
+                        // In the active wave - full brightness
+                        dot.opacity = 1;
                     } else {
-                        // Before wave, maintain current shape
+                        // Wave hasn't reached this dot yet
                         if (dot.isPartOfCurrentShape) {
                             dot.opacity = 1;
-                        } else if (Math.abs(distanceFromWave) <= this.activeColumnWidth / 2) {
-                            // Apply wave effect
-                            dot.opacity = this.calculateWaveEffect(distanceFromWave, waveProgress.value, currentTime);
                         } else {
                             dot.opacity = 0.2;
                         }
@@ -226,7 +209,7 @@ export class GridSystem {
                 });
             }
         })
-        .to({}, { duration: this.pauseDuration }); // Pause to display shape
+        .to({}, { duration: this.pauseDuration });
 
         return tl;
     }
