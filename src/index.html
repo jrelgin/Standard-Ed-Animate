@@ -8,6 +8,7 @@
     <style>
         body {
             margin: 0;
+            padding: 0;
             overflow: hidden;
             background: #000;
             font-family: Arial, sans-serif;
@@ -16,17 +17,21 @@
             width: 100vw;
             height: 100vh;
         }
-        .nav-link {
+        .nav-links {
             position: fixed;
             top: 20px;
             left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        .nav-link {
             color: white;
             text-decoration: none;
             padding: 10px 20px;
             border: 1px solid white;
             border-radius: 5px;
             transition: all 0.3s ease;
-            z-index: 100;
         }
         .nav-link:hover {
             background: white;
@@ -41,7 +46,10 @@
     <div id="controls">
         <button id="toggle-debug">Toggle Debug Mode</button>
     </div>
-    <a href="physics.html" class="nav-link">Physics Animation</a>
+    <div class="nav-links">
+        <a href="physics.html" class="nav-link">Pie Animation</a>
+        <a href="delta.html" class="nav-link">Delta Animation</a>
+    </div>
     <script type="module" src="js/grid-animation/main.js"></script>
 </body>
 </html>
