@@ -43,8 +43,8 @@ export class PhysicsAnimation {
             // Create and append the path (invisible, just for hit testing)
             const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
             newPath.setAttribute('d', path.getAttribute('d'));
-            newPath.setAttribute('fill', 'none');
-            newPath.style.display = 'none';
+            newPath.setAttribute('fill', '#000000');
+            newPath.style.fillOpacity = '0';
             this.svg.appendChild(newPath);
             
             // Store reference to the path
