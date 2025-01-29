@@ -50,11 +50,30 @@ export class GridSystem {
         const offsetX = (width - (this.columns - 1) * this.spacing) / 2;
         const offsetY = (height - (this.rows - 1) * this.spacing) / 2;
 
-        // Generate random fade multipliers for each row (between 0.3 and 3.0 for high contrast)
-        const rowFadeMultipliers = Array(this.rows).fill(0).map(() => 0.3 + Math.random() * 2.7);
+        // Generate random fade multipliers with more distinct speed groups
+        const rowFadeMultipliers = Array(this.rows).fill(0).map(() => {
+            const rand = Math.random();
+            if (rand < 0.25) {
+                // 25% super fast, instant fade
+                return 15.0 + Math.random() * 5.0; // 15-20x speed
+            } else if (rand < 0.5) {
+                // 25% medium-fast fade
+                return 6.0 + Math.random() * 3.0; // 6-9x speed
+            } else if (rand < 0.75) {
+                // 25% slower visible fade
+                return 2.0 + Math.random() * 2.0; // 2-4x speed
+            } else {
+                // 25% very slow fade for contrast
+                return 0.5 + Math.random() * 0.5; // 0.5-1x speed
+            }
+        });
 
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.columns; col++) {
+                // Add subtle variation within each row (±20%)
+                const rowMultiplier = rowFadeMultipliers[row];
+                const dotVariation = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
+                
                 this.dots.push({
                     x: offsetX + col * this.spacing,
                     y: offsetY + row * this.spacing,
@@ -63,7 +82,7 @@ export class GridSystem {
                     isPartOfShape: false,
                     opacity: 0.2,
                     wavePosition: -1,
-                    fadeMultiplier: rowFadeMultipliers[row] // Store the row's fade multiplier
+                    fadeMultiplier: rowMultiplier * dotVariation
                 });
             }
         }
@@ -184,11 +203,10 @@ export class GridSystem {
                         if (dot.isPartOfNextShape) {
                             dot.opacity = 1;  // Part of new shape, snap to full brightness
                         } else {
-                            // Not part of shape, apply randomized fade effect
+                            // Fade over a medium distance
                             const fadeDistance = Math.abs(distanceFromWave);
-                            const fadeLength = this.activeColumnWidth * 0.5;
+                            const fadeLength = this.activeColumnWidth * 0.8; // Longer fade length
                             if (fadeDistance <= fadeLength) {
-                                // Apply the row's fade multiplier to create varying fade speeds
                                 const fadeProgress = (fadeDistance / fadeLength) * dot.fadeMultiplier;
                                 dot.opacity = Math.max(0.2, 1 - fadeProgress);
                             } else {
