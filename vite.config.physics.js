@@ -3,10 +3,10 @@ export default {
   base: '/',
   build: {
     outDir: '../dist',
-    emptyOutDir: true,
+    emptyOutDir: false,
     rollupOptions: {
       input: {
-        main: 'src/index.html'
+        physics: 'src/physics.html'
       }
     }
   },
