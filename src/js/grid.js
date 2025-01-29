@@ -50,7 +50,7 @@ export class GridSystem {
         const offsetX = (width - (this.columns - 1) * this.spacing) / 2;
         const offsetY = (height - (this.rows - 1) * this.spacing) / 2;
 
-        // Generate random fade multipliers with more distinct speed groups
+        // Generate random fade multipliers and lengths for each row
         const rowFadeMultipliers = Array(this.rows).fill(0).map(() => {
             const rand = Math.random();
             if (rand < 0.25) {
@@ -68,6 +68,21 @@ export class GridSystem {
             }
         });
 
+        // Generate random fade lengths for each row
+        const rowFadeLengths = Array(this.rows).fill(0).map(() => {
+            const rand = Math.random();
+            if (rand < 0.3) {
+                // 30% very short trails
+                return 0.3 + Math.random() * 0.2; // 0.3-0.5x active width
+            } else if (rand < 0.6) {
+                // 30% medium trails
+                return 0.8 + Math.random() * 0.4; // 0.8-1.2x active width
+            } else {
+                // 40% long trails
+                return 1.5 + Math.random() * 1.0; // 1.5-2.5x active width
+            }
+        });
+
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.columns; col++) {
                 // Add subtle variation within each row (±20%)
@@ -82,7 +97,8 @@ export class GridSystem {
                     isPartOfShape: false,
                     opacity: 0.2,
                     wavePosition: -1,
-                    fadeMultiplier: rowMultiplier * dotVariation
+                    fadeMultiplier: rowMultiplier * dotVariation,
+                    fadeLength: rowFadeLengths[row] * this.activeColumnWidth
                 });
             }
         }
@@ -203,11 +219,10 @@ export class GridSystem {
                         if (dot.isPartOfNextShape) {
                             dot.opacity = 1;  // Part of new shape, snap to full brightness
                         } else {
-                            // Fade over a medium distance
+                            // Use the dot's custom fade length
                             const fadeDistance = Math.abs(distanceFromWave);
-                            const fadeLength = this.activeColumnWidth * 0.8; // Longer fade length
-                            if (fadeDistance <= fadeLength) {
-                                const fadeProgress = (fadeDistance / fadeLength) * dot.fadeMultiplier;
+                            if (fadeDistance <= dot.fadeLength) {
+                                const fadeProgress = (fadeDistance / dot.fadeLength) * dot.fadeMultiplier;
                                 dot.opacity = Math.max(0.2, 1 - fadeProgress);
                             } else {
                                 dot.opacity = 0.2;
