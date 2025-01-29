@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build -c vite.config.physics.js && vite build -c vite.config.delta.js",
+    "build": "vite build && vite build -c vite.config.physics.js && vite build -c vite.config.delta.js && cp -r src/assets dist/",
     "preview": "vite preview"
   },
   "keywords": [
