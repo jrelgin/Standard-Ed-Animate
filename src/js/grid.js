@@ -13,9 +13,9 @@ export class GridSystem {
         
         // Animation configuration
         this.timeline = gsap.timeline();
-        this.flowDuration = 4; // in seconds for GSAP
-        this.pauseDuration = 6; // in seconds for GSAP
-        this.activeColumnWidth = 8; // Number of columns that are "lit up" in the wave
+        this.flowDuration = 2; // in seconds for GSAP
+        this.pauseDuration = 2; // in seconds for GSAP
+        this.activeColumnWidth = 50; // Number of columns that are "lit up" in the wave
         this.pulseFrequency = 3; // How many times the wave pulses per second
         
         // Handle high DPI displays
