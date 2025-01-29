@@ -7,12 +7,12 @@ export class PhysicsAnimation {
         this.particles = [];
         this.mouseX = 0;
         this.mouseY = 0;
-        this.gravity = 0.1;
-        this.influenceRadius = 10;  // Smaller influence radius for smaller SVG
-        this.maxScale = 2.5;
-        this.particleSize = 0.5;    // Much smaller dots
-        this.spacing = 1;           // Much tighter spacing
-        this.svgColor = '#247B7B';  // Delta's teal color
+        this.gravity = 0.1;          // Same as pie
+        this.influenceRadius = 15;   // Adjusted for scale but similar feel to pie
+        this.maxScale = 2.5;         // Same as pie
+        this.particleSize = 0.5;     // Keep small for detail
+        this.spacing = 1;            // Keep tight for detail
+        this.svgColor = '#247B7B';   // Delta's teal color
         
         // Initialize
         this.loadSVG().then(() => {
@@ -36,10 +36,10 @@ export class PhysicsAnimation {
             const originalSvg = svgDoc.querySelector('svg');
             const path = svgDoc.querySelector('path');
             
-            // Set the viewBox to match the original SVG
-            this.svg.setAttribute('viewBox', '0 0 81 70');
+            // Set the viewBox to match the original SVG but with extra space at bottom
+            this.svg.setAttribute('viewBox', '0 0 81 72'); // Added 2 units for bottom dots
             this.svg.style.width = '80vmin';
-            this.svg.style.height = '69vmin';  // Maintain aspect ratio
+            this.svg.style.height = '71vmin';  // Maintain aspect ratio
             
             // Create and append the path (invisible, just for hit testing)
             const newPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -63,9 +63,9 @@ export class PhysicsAnimation {
     }
 
     createParticles() {
-        // Calculate grid dimensions based on SVG size
+        // Calculate grid dimensions based on SVG size plus extra row
         const cols = Math.floor(81 / this.spacing);
-        const rows = Math.floor(70 / this.spacing);
+        const rows = Math.floor(72 / this.spacing); // Extended for bottom dots
         
         // Create grid of particles
         for (let row = 0; row < rows; row++) {
@@ -101,7 +101,7 @@ export class PhysicsAnimation {
         this.svg.addEventListener('mousemove', (e) => {
             const rect = this.svg.getBoundingClientRect();
             const scaleX = 81 / rect.width;
-            const scaleY = 70 / rect.height;
+            const scaleY = 72 / rect.height; // Update scaleY
             
             // Convert mouse position to SVG coordinates
             this.mouseX = (e.clientX - rect.left) * scaleX;
