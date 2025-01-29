@@ -8,7 +8,7 @@ export class PhysicsAnimation {
         this.mouseX = 0;
         this.mouseY = 0;
         this.gravity = 0.1;          // Same as pie
-        this.influenceRadius = 15;   // Adjusted for scale but similar feel to pie
+        this.influenceRadius = 150;  // EXACTLY same as pie, no scaling needed!
         this.maxScale = 2.5;         // Same as pie
         this.particleSize = 0.5;     // Keep small for detail
         this.spacing = 1;            // Keep tight for detail
@@ -120,17 +120,17 @@ export class PhysicsAnimation {
                 // Calculate influence based on distance
                 const influence = 1 - (distance / this.influenceRadius);
                 
-                // Even gentler push force
+                // Even gentler push force - EXACTLY same as pie
                 const pushForce = 0.5;
                 particle.velocityX -= (dx / distance) * pushForce * influence;
                 particle.velocityY -= (dy / distance) * pushForce * influence;
                 
                 // Scale up based on proximity with smoother transition
                 const targetScale = 1 + (this.maxScale - 1) * influence;
-                particle.scale += (targetScale - particle.scale) * 0.15;
+                particle.scale += (targetScale - particle.scale) * 0.15;  // Same as pie
             } else {
                 // Return to original size more smoothly
-                particle.scale += (1 - particle.scale) * 0.15;
+                particle.scale += (1 - particle.scale) * 0.15;  // Same as pie
             }
             
             // Apply gravity towards original position
@@ -140,8 +140,8 @@ export class PhysicsAnimation {
             particle.velocityY += homeY * this.gravity;
             
             // Even stronger damping for smoother movement
-            particle.velocityX *= 0.9;
-            particle.velocityY *= 0.9;
+            particle.velocityX *= 0.9;  // Same as pie
+            particle.velocityY *= 0.9;  // Same as pie
             particle.x += particle.velocityX;
             particle.y += particle.velocityY;
             
